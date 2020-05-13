@@ -62,7 +62,7 @@ proxymock-cli
 ```
 
 ## 运行截图
-![](https://github.com/iguzhi/proxymock-cli/raw/master/img/proxymock.png)
+![](https://github.com/iguzhi/proxymock-cli/blob/master/img/proxymock.png)
 
 ## 参考资料
 
