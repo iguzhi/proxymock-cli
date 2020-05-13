@@ -1,36 +1,94 @@
-const program = require('commander');
+const chokidar = require('chokidar');
 const chalk = require('chalk');
-const { version } = require('./package.json');
+const path = require('path');
+const debug = require('debug')('proxymock:cli');
+const { proxyMock } = require('node-proxymock');
+const { getChangedFileContent, getAddedFileContent } = require('./lib/utils');
+const { parseRule, getRuleKey } = require('./lib/parser');
 
-program
-.name(chalk.green('proxymock'))
-.usage(chalk.blue('-d') + chalk.yellow(' <mock data directory>') + chalk.blue(' [-w]'))
-.version(version, '-v, --version', chalk.blue('output the current version'))
-// .command('proxymock')
-// .alias('pk')
-.description('Welcome to use proxymock to mock data !')
-.option('-d, --dir <directory path>', chalk.blue('setup mock data directory'))
-.option('-w, --watch', chalk.blue('watch files changing in mock data directory'))
-.helpOption('-h, --help', chalk.blue('display help for command'))
-// 执行的操作
-.action(function(cmd, options) {
-  // 参数可以拿到
-  // console.log(Array.prototype.slice.call(arguments, 1));
-})
-// 自定义help信息
-.on('--help', () => {
-  console.log('-------------------------------------------------------------------------');
-  console.log('Examples:');
-  console.log('$ %s %s %s %s', chalk.green('proxymock'), chalk.blue('-d'), chalk.yellow('/home/mockdata'), chalk.blue(' -w'));
-  console.log('$ %s %s %s %s', chalk.green('pk'), chalk.blue('-d'), chalk.yellow('/home/mockdata'), chalk.blue(' -w'));
-})
-.parse(process.argv);
+const log = console.log.bind(console);
 
+const rules = Object.create(null);
 
-// 参数长度不够, 打印帮助信息
-if (!process.argv.slice(2).length) {
-  program.outputHelp();
+function startProxyMock(dir, systemProxy) {
+  const watcher = chokidar.watch(
+    path.isAbsolute(dir) ? dir : path.resolve(__dirname, dir),
+    {
+      ignored: /(^|[\/\\])\../, // ignore dotfiles
+      persistent: true
+    }
+  );
+
+  watcher
+  .on('add', filepath => addRule(filepath))
+  .on('change', filepath => updateRule(filepath))
+  .on('unlink', filepath => removeRule(filepath));
+
+  proxyMock({
+    rules,
+    setSystemProxy: systemProxy
+  });
 }
 
-// 解析命令行参数
-program.parse(process.argv);
+async function addRule(filepath) {
+  const content = await getAddedFileContent(filepath);
+  // log(chalk.green('[proxymock]'), chalk.blue('file'), chalk.yellow(filepath), chalk.blue('added to watch.'));
+
+  if (!content) {
+    return;
+  }
+
+  const { key, rule, disable } = parseRule(content, filepath);
+  debug('addRule: key', key);
+  debug('addRule: rule', rule);
+  debug('addRule: disable', disable);
+  if (key && rule && !disable) {
+    rules[key] = rule;
+    log(chalk.green('[proxymock]'), chalk.blue('rule'), chalk.yellow(key), chalk.blue('added.'));
+  }
+  debug('rules', rules);
+}
+
+async function updateRule(filepath) {
+  const changedContent = await getChangedFileContent(filepath);
+
+  if (!changedContent) {
+    return;
+  }
+
+  // log(chalk.green('[proxymock]'), chalk.blue('file'), chalk.yellow(filepath), chalk.blue('updated.'));
+  const { key, oldKey, rule, disable } = parseRule(changedContent, filepath);
+  debug('updateRule: key', key);
+  debug('updateRule: rule', rule);
+  debug('updateRule: disable', disable);
+  if (key) {
+    if (disable) {
+      delete rules[key];
+      log(chalk.red('[proxymock]'), chalk.red('rule'), chalk.yellow(key), chalk.red('removed.'));
+    }
+    else if (rule) {
+      if (oldKey && oldKey !== key) {
+        delete rules[oldKey];
+        log(chalk.red('[proxymock]'), chalk.red('rule'), chalk.yellow(oldKey), chalk.red('removed.'));
+        rules[key] = rule;
+        log(chalk.green('[proxymock]'), chalk.blue('rule'), chalk.yellow(key), chalk.blue('added.'));
+      }
+      else {
+        log(chalk.green('[proxymock]'), chalk.blue('rule'), chalk.yellow(key), chalk.blue(rules[key] ? 'updated.' : 'added.'));
+        rules[key] = rule;
+      }
+    }
+  }
+}
+
+function removeRule(filepath) {
+  // log(chalk.red('[proxymock]'), chalk.red('file'), chalk.yellow(filepath), chalk.red('removed.'));
+  const key = getRuleKey(filepath);
+
+  if (key) {
+    delete rules[key];
+    log(chalk.red('[proxymock]'), chalk.red('rule'), chalk.yellow(key), chalk.red('removed.'));
+  }
+}
+
+module.exports = startProxyMock;
