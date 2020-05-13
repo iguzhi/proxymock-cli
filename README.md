@@ -61,6 +61,9 @@ proxymock-cli
   };
 ```
 
+## 运行截图
+![](https://github.com/iguzhi/proxymock-cli/raw/master/img/proxymock.png)
+
 ## 参考资料
 
 [nodejs动态加载代码](https://blog.csdn.net/qq_39807732/article/details/88087348)
