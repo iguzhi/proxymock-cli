@@ -1,6 +1,6 @@
 {
   "name": "proxymock-cli",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "proxymock-cli",
   "main": "index.js",
   "bin": {
