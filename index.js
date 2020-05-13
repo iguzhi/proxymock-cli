@@ -14,7 +14,7 @@ function startProxyMock(dir, systemProxy) {
   const watcher = chokidar.watch(
     path.isAbsolute(dir) ? dir : path.resolve(__dirname, dir),
     {
-      ignored: /(^|[\/\\])\../, // ignore dotfiles
+      // ignored: /(^|[\/\\])\../, // ignore dotfiles
       persistent: true
     }
   );
