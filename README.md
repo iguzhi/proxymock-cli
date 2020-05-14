@@ -5,12 +5,14 @@ proxymock-cli
 
 * 安装 `yarn global add proxymock-li` 或 `npm install proxymock-cli -g`
 
-* 执行 `proxymock -d <mock data directory> [-s]`
+* 执行 `proxymock -d <mock data directory> [-s] [-l <log level>]`
 
 ```
-  -d: mock数据文件存放目录
-  -s: 是否设置系统代理为proxymock代理服务器的ip和端口
+  -d: mock数据文件存放目录, <必填>
+  -s: 是否设置系统代理为proxymock代理服务器的ip和端口, [选填]
+  -l: 日志级别, 日志使用log4js, 可选级别同log4js配置项: `trace、debug、info、warn、error、fatal`, [选填]
 ```
+* 日志打印目录为操作系统登录用户目录下的`.proxymock`文件夹, windows系统如 `C:\Users\your-pc-name\.proxymock`
 
 ## mock文件指令规则
 

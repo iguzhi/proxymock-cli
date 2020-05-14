@@ -24,7 +24,8 @@ function startProxyMock(dir, systemProxy) {
 
   proxyMock({
     rules: {},
-    setSystemProxy: systemProxy
+    setSystemProxy: systemProxy,
+    logLevel: logLevel || 'error'
   });
 }
 

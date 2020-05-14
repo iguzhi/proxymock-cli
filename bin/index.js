@@ -8,14 +8,15 @@ const startProxyMock = require('../');
 
 program
 .name(chalk.green('proxymock'))
-.usage(chalk.blue('-d') + chalk.yellow(' <mock data directory>') + chalk.blue(' [-w]'))
+.usage(chalk.blue('-d') + chalk.yellow(' <mock data directory>') + chalk.blue(' [-s] [-l <log level>]'))
 .version(version, '-v, --version', chalk.blue('output the current version'))
 .description('Welcome to use proxymock to mock data !')
 .option('-d, --dir <mock data directory>', chalk.blue('setup mock data directory'))
 .option('-s, --system-proxy', chalk.blue('set system proxy'))
+.option('-l, --log-level <log level>', chalk.blue('set log level'))
 .helpOption('-h, --help', chalk.blue('display help for command'))
-.action(_.debounce(({ dir, systemProxy = false }) => {
-  startProxyMock(dir, systemProxy);
+.action(_.debounce(({ dir, systemProxy = false, logLevel }) => {
+  startProxyMock(dir, systemProxy, logLevel);
 }))
 .on('--help', () => {
   console.log('-------------------------------------------------------------------------');
