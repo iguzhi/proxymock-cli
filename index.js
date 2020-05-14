@@ -2,13 +2,11 @@ const chokidar = require('chokidar');
 const chalk = require('chalk');
 const path = require('path');
 const debug = require('debug')('proxymock:cli');
-const { proxyMock } = require('node-proxymock');
+const { proxyMock, parseRegExpRule, getState } = require('node-proxymock');
 const { getChangedFileContent, getAddedFileContent } = require('./lib/utils');
 const { parseRule, getRuleKey } = require('./lib/parser');
 
 const log = console.log.bind(console);
-
-const rules = Object.create(null);
 
 function startProxyMock(dir, systemProxy) {
   const watcher = chokidar.watch(
@@ -25,12 +23,13 @@ function startProxyMock(dir, systemProxy) {
   .on('unlink', filepath => removeRule(filepath));
 
   proxyMock({
-    rules,
+    rules: {},
     setSystemProxy: systemProxy
   });
 }
 
 async function addRule(filepath) {
+  const { rules, regExpRules } = getState();
   const content = await getAddedFileContent(filepath);
   // log(chalk.green('[proxymock]'), chalk.blue('file'), chalk.yellow(filepath), chalk.blue('added to watch.'));
 
@@ -43,13 +42,20 @@ async function addRule(filepath) {
   debug('addRule: rule', rule);
   debug('addRule: disable', disable);
   if (key && rule && !disable) {
-    rules[key] = rule;
     log(chalk.green('[proxymock]'), chalk.blue('rule'), chalk.yellow(key), chalk.blue('added.'));
+    const regExpRule = parseRegExpRule(key, rule);
+    if (regExpRule) {
+      regExpRules[key] = regExpRule;
+    }
+    else {
+      rules[key] = rule;
+    }
   }
   debug('rules', rules);
 }
 
 async function updateRule(filepath) {
+  const { rules, regExpRules } = getState();
   const changedContent = await getChangedFileContent(filepath);
 
   if (!changedContent) {
@@ -64,29 +70,47 @@ async function updateRule(filepath) {
   if (key) {
     if (disable) {
       delete rules[key];
+      delete regExpRules[key];
       log(chalk.red('[proxymock]'), chalk.red('rule'), chalk.yellow(key), chalk.red('removed.'));
     }
     else if (rule) {
       if (oldKey && oldKey !== key) {
         delete rules[oldKey];
+        delete regExpRules[oldKey];
         log(chalk.red('[proxymock]'), chalk.red('rule'), chalk.yellow(oldKey), chalk.red('removed.'));
-        rules[key] = rule;
+        
+        const regExpRule = parseRegExpRule(key, rule);
+        if (regExpRule) {
+          regExpRules[key] = regExpRule;
+        }
+        else {
+          rules[key] = rule;
+        }
         log(chalk.green('[proxymock]'), chalk.blue('rule'), chalk.yellow(key), chalk.blue('added.'));
       }
       else {
-        log(chalk.green('[proxymock]'), chalk.blue('rule'), chalk.yellow(key), chalk.blue(rules[key] ? 'updated.' : 'added.'));
-        rules[key] = rule;
+        log(chalk.green('[proxymock]'), chalk.blue('rule'), chalk.yellow(key), chalk.blue(rules[key] || regExpRules[key] ? 'updated.' : 'added.'));
+        
+        const regExpRule = parseRegExpRule(key, rule);
+        if (regExpRule) {
+          regExpRules[key] = regExpRule;
+        }
+        else {
+          rules[key] = rule;
+        }
       }
     }
   }
 }
 
 function removeRule(filepath) {
+  const { rules, regExpRules } = getState();
   // log(chalk.red('[proxymock]'), chalk.red('file'), chalk.yellow(filepath), chalk.red('removed.'));
   const key = getRuleKey(filepath);
 
   if (key) {
     delete rules[key];
+    delete regExpRules[key];
     log(chalk.red('[proxymock]'), chalk.red('rule'), chalk.yellow(key), chalk.red('removed.'));
   }
 }

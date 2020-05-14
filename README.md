@@ -14,11 +14,13 @@ proxymock-cli
 
 ## mock文件指令规则
 
-* 以单行注释语法`//`作为mock文件规则的指令, 指令不支持多行注释语法`/**/`
+* 以单行注释语法 `//` 作为mock文件规则的指令, 指令不支持多行注释语法 `/**/`
 
-* `// proxymock: [^] <GET|POST|PUT> <https://weather.qq.com/api/shanghai.do>` 此指令必选; 指令中`<>`表示必填, `[]`表示选填, `|`表示多选一
+* `// proxymock: [^] <GET|POST|PUT|DELETE> <url>` 此指令必选; 指令中`<>`表示必填, `[]`表示选填, `|`表示多选一
 
 * `// proxymock-disable: [true|false]` 此指令可选
+
+* `<url>` 部分支持正则表达式
 
 ## mock文件示例
 
@@ -58,6 +60,16 @@ proxymock-cli
         feeling: 'cold'
       });
     }
+  };
+```
+
+```
+  // proxymock: GET /weather\.[a-z]{2}\.com\/api/
+  // proxymock-disable: false
+  // 正则示例
+
+  module.exports = async function(req, res, rawData) {
+    return { feeling: 'cool', temperature: 22, desc: '秋高气爽' }；
   };
 ```
 
