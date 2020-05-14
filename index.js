@@ -8,7 +8,7 @@ const { parseRule, getRuleKey } = require('./lib/parser');
 
 const log = console.log.bind(console);
 
-function startProxyMock(dir, systemProxy) {
+function startProxyMock(dir, systemProxy, logLevel) {
   const watcher = chokidar.watch(
     path.isAbsolute(dir) ? dir : path.resolve(process.cwd(), dir),
     {
@@ -25,7 +25,7 @@ function startProxyMock(dir, systemProxy) {
   proxyMock({
     rules: {},
     setSystemProxy: systemProxy,
-    logLevel: logLevel || 'error'
+    logLevel: logLevel || 'info'
   });
 }
 
