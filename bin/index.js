@@ -16,11 +16,12 @@ const { exist } = getCAStatus();
 
 if (!exist) {
   console.warn(chalk.cyan('[proxymock]'), 'root CA is not exists, your can generate one root CA to run - "proxymock-ca -r", and then');
+  const platform = os.platform();
   if (platform === 'darwin') {
-    console.warn(' > run - "proxymock-ca -t" to trust the root CA')
+    console.warn(chalk.cyan('[proxymock]'), '> run - "proxymock-ca -t" to trust the root CA.')
   }
-  if (/^win/.test(process.platform)) {
-    console.warn(' > import it into system CA file list to trust the root CA manually');
+  if (/^win/.test(platform)) {
+    console.warn(chalk.cyan('[proxymock]'), '> import it into system CA file list to trust the root CA manually.');
   }
 }
 
