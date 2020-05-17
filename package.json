@@ -1,14 +1,17 @@
 {
   "name": "proxymock-cli",
-  "version": "0.0.11",
+  "version": "0.1.0",
   "description": "proxymock-cli",
   "main": "index.js",
   "bin": {
     "proxymock": "./bin/index.js",
-    "pk": "./bin/index.js"
+    "pk": "./bin/index.js",
+    "proxymock-ca": "./bin/ca.js",
+    "pk-ca": "./bin/ca.js"
   },
   "scripts": {
-    "start": "node ./bin/index",
+    "pk": "node ./bin/index",
+    "pk-ca": "node ./bin/ca",
     "debug": "cross-env DEBUG=proxymock:* yarn start",
     "test": "node ./test"
   },
@@ -34,7 +37,7 @@
     "debug": "^4.1.1",
     "inquirer": "^7.1.0",
     "lodash": "^4.17.15",
-    "node-proxymock": "^0.3.6",
+    "node-proxymock": "^0.4.2",
     "ora": "^4.0.4"
   }
 }

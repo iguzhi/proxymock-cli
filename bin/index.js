@@ -1,10 +1,28 @@
 #!/usr/bin/env node
 
+const os = require('os');
 const program = require('commander');
 const chalk = require('chalk');
 const _ = require('lodash');
 const { version } = require('../package.json');
+const {
+  generateRootCA,
+  getCAStatus,
+  trustRootCA
+} = require('node-proxymock');
 const startProxyMock = require('../');
+
+const { exist } = getCAStatus();
+
+if (!exist) {
+  console.warn(chalk.cyan('[proxymock]'), 'root CA is not exists, your can generate one root CA to run - "proxymock-ca -r", and then');
+  if (platform === 'darwin') {
+    console.warn(' > run - "proxymock-ca -t" to trust the root CA')
+  }
+  if (/^win/.test(process.platform)) {
+    console.warn(' > import it into system CA file list to trust the root CA manually');
+  }
+}
 
 program
 .name(chalk.green('proxymock'))

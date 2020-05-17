@@ -9,6 +9,10 @@ const { parseRule, getRuleKey } = require('./lib/parser');
 const log = console.log.bind(console);
 
 function startProxyMock(dir, systemProxy, logLevel) {
+  if (!dir) {
+    console.error(chalk.red('[proxymock]'), 'dir is ', dir);
+    return;
+  }
   const watcher = chokidar.watch(
     path.isAbsolute(dir) ? dir : path.resolve(process.cwd(), dir),
     {
@@ -79,7 +83,7 @@ async function updateRule(filepath) {
         delete rules[oldKey];
         delete regExpRules[oldKey];
         log(chalk.red('[proxymock]'), chalk.red('rule'), chalk.yellow(oldKey), chalk.red('removed.'));
-        
+
         const regExpRule = parseRegExpRule(key, rule);
         if (regExpRule) {
           regExpRules[key] = regExpRule;
@@ -91,7 +95,7 @@ async function updateRule(filepath) {
       }
       else {
         log(chalk.green('[proxymock]'), chalk.blue('rule'), chalk.yellow(key), chalk.blue(rules[key] || regExpRules[key] ? 'updated.' : 'added.'));
-        
+
         const regExpRule = parseRegExpRule(key, rule);
         if (regExpRule) {
           regExpRules[key] = regExpRule;
