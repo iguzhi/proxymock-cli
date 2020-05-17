@@ -1,6 +1,6 @@
 {
   "name": "proxymock-cli",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "proxymock-cli",
   "main": "index.js",
   "bin": {
@@ -37,7 +37,7 @@
     "debug": "^4.1.1",
     "inquirer": "^7.1.0",
     "lodash": "^4.17.15",
-    "node-proxymock": "^0.4.2",
+    "node-proxymock": "^0.4.3",
     "ora": "^4.0.4"
   }
 }
