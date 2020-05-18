@@ -10,7 +10,7 @@ proxymock-cli
 ```
   -d: mock数据文件存放目录, <必填>
   -s: 是否设置系统代理为proxymock代理服务器的ip和端口, [选填]
-  -l: 日志级别, 默认级别`info`, 可选级别项: `debug`、`inf`o、`warn`、`error`, [选填]
+  -l: 日志级别, 默认级别`info`, 可选级别项: `debug`、`info`、`warn`、`error`, [选填]
 ```
 * 日志打印目录为操作系统登录用户目录下的`.proxymock`文件夹, windows系统如 `C:\Users\your-pc-name\.proxymock`
 
@@ -77,6 +77,16 @@ proxymock-cli
 
 ## 运行截图
 ![](https://github.com/iguzhi/proxymock-cli/blob/master/img/proxymock.png)
+
+## CA根证书生成与信任
+
+运行 `proxymock -d <mock data directory> [-s] [-l <log level>]` 时, 会检测root CA证书是否存在, 若不存在会提醒生成证书. 也可以在启动代理服务器前主动生成证书并信任之.(根证书在一台电脑上通常只需要生成一次)
+
+* 运行 `proxymock-ca -r` 生成根证书, 会打印出生成的证书文件路径
+
+* 信任证书: windows系统需要手动导入上一步生成的根证书; MAC可运行 `proxymock-ca -t` 尝试导入信任
+
+* 查看导入的证书列表是否包含名为 **DO NOT TRUST PROXYMOCK ROOT CA** 的证书, 若存在说明信任成功
 
 ## 参考资料
 
