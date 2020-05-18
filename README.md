@@ -86,7 +86,7 @@ proxymock-cli
 
 * 信任证书: windows系统需要手动导入上一步生成的根证书; MAC可运行 `proxymock-ca -t` 尝试导入信任
 
-* 查看导入的证书列表是否包含名为 **DO NOT TRUST PROXYMOCK ROOT CA** 的证书, 若存在说明信任成功
+* 查看系统的根证书列表是否包含名为 **DO NOT TRUST PROXYMOCK ROOT CA** 的根证书, 若存在说明信任成功
 
 ## 参考资料
 
